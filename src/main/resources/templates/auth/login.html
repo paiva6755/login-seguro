@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+<head><title>Entrar</title></head>
+<body>
+<div layout:fragment="conteudo" class="caixa-formulario">
+    <h1>Entrar</h1>
+
+    <!-- Mensagem genérica de propósito: não revela se o e-mail existe -->
+    <p class="aviso aviso-erro" role="alert" th:if="${param.erro}">
+        Não foi possível entrar. Confira e-mail e senha. Após 5 tentativas erradas
+        a conta fica bloqueada por 15 minutos.
+    </p>
+    <p class="aviso aviso-sucesso" role="status" th:if="${param.saiu}">Você saiu da sua conta.</p>
+
+    <!-- th:action adiciona automaticamente o campo oculto _csrf -->
+    <form th:action="@{/login}" method="post" class="formulario">
+        <div class="campo">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" required autocomplete="username" autofocus>
+        </div>
+        <div class="campo">
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" name="senha" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="botao botao-largo">Entrar</button>
+    </form>
+
+    <p class="rodape-formulario">Ainda não tem conta? <a th:href="@{/cadastro}">Criar conta</a></p>
+</div>
+</body>
+</html>

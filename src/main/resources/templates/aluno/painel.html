@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/base}">
+<head><title>Área do aluno</title></head>
+<body>
+<div layout:fragment="conteudo">
+    <h1>Olá, <span sec:authentication="principal.nome">aluno</span></h1>
+    <p class="texto-apoio">Esta é a área do aluno. Aqui entra o conteúdo principal do projeto de PFC.</p>
+
+    <section class="bloco">
+        <h2>Sua conta</h2>
+        <dl class="dados">
+            <div><dt>E-mail</dt><dd sec:authentication="name">email</dd></div>
+            <div><dt>Perfil</dt><dd sec:authentication="principal.perfil.descricao">Aluno</dd></div>
+        </dl>
+    </section>
+</div>
+</body>
+</html>

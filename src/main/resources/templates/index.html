@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/base}">
+<head><title>Início</title></head>
+<body>
+<div layout:fragment="conteudo">
+    <section class="abertura">
+        <h1 class="titulo-grande">Cada perfil vê só o que lhe cabe.</h1>
+        <p class="texto-apoio">
+            Crie sua conta como aluno. Professores e administradores recebem
+            acesso ampliado pela área de usuários.
+        </p>
+        <div class="acoes" sec:authorize="!isAuthenticated()">
+            <a th:href="@{/cadastro}" class="botao">Criar conta</a>
+            <a th:href="@{/login}" class="botao botao-discreto">Já tenho conta</a>
+        </div>
+        <div class="acoes" sec:authorize="isAuthenticated()">
+            <a th:href="@{/painel}" class="botao">Ir para meu painel</a>
+        </div>
+    </section>
+
+    <section class="perfis">
+        <h2>Perfis de acesso</h2>
+        <dl class="lista-perfis">
+            <div><dt>Aluno</dt><dd>Acessa a própria área de estudos.</dd></div>
+            <div><dt>Professor</dt><dd>Acessa a área do aluno e acompanha a turma.</dd></div>
+            <div><dt>Administrador</dt><dd>Acessa tudo e gerencia perfis e contas.</dd></div>
+        </dl>
+    </section>
+</div>
+</body>
+</html>

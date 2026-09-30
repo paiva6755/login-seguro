@@ -1,0 +1,36 @@
+/* Tema "escuro": mesma estrutura, cores invertidas. Só variáveis. */
+:root {
+    --fonte-texto: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --fonte-titulo: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --peso-titulo: 600;
+
+    --cor-fundo: #15181E;
+    --cor-superficie: #1D2129;
+    --cor-superficie-2: #252A34;
+    --cor-campo: #15181E;
+    --cor-cabecalho: #1D2129;
+    --borda-cabecalho: 1px solid #2E3440;
+
+    --cor-texto: #E6E9EF;
+    --cor-texto-suave: #9AA3B2;
+    --cor-marca: #E6E9EF;
+    --cor-link: #8AB4FF;
+    --cor-link-hover: #B3CDFF;
+    --cor-foco: #FFD166;
+
+    --cor-primaria: #8AB4FF;
+    --cor-primaria-hover: #B3CDFF;
+    --cor-primaria-texto: #10141C;
+
+    --cor-borda: #2E3440;
+    --cor-borda-forte: #465062;
+
+    --cor-sucesso: #5CC99A;
+    --cor-sucesso-fundo: #1C3A2E;
+    --cor-erro: #FF8A7A;
+    --cor-erro-fundo: #3D2220;
+    --cor-alerta-fundo: #3D3320;
+
+    --raio: 6px;
+    --raio-grande: 10px;
+}

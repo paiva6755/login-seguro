@@ -1,0 +1,36 @@
+/* Tema "padrao": claro, azul-tinta sobre papel frio. Só variáveis. */
+:root {
+    --fonte-texto: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --fonte-titulo: Georgia, "Times New Roman", serif;
+    --peso-titulo: 700;
+
+    --cor-fundo: #EEF1F5;
+    --cor-superficie: #FFFFFF;
+    --cor-superficie-2: #F5F7FA;
+    --cor-campo: #FFFFFF;
+    --cor-cabecalho: #FFFFFF;
+    --borda-cabecalho: 1px solid #D5DBE5;
+
+    --cor-texto: #1B2233;
+    --cor-texto-suave: #556078;
+    --cor-marca: #1D3F9E;
+    --cor-link: #1D4FD1;
+    --cor-link-hover: #143A9E;
+    --cor-foco: #F2A93B;
+
+    --cor-primaria: #1D4FD1;
+    --cor-primaria-hover: #143A9E;
+    --cor-primaria-texto: #FFFFFF;
+
+    --cor-borda: #DDE2EA;
+    --cor-borda-forte: #B9C2D0;
+
+    --cor-sucesso: #1F8A5B;
+    --cor-sucesso-fundo: #E3F4EC;
+    --cor-erro: #C0392B;
+    --cor-erro-fundo: #FBE9E7;
+    --cor-alerta-fundo: #FDF1D8;
+
+    --raio: 6px;
+    --raio-grande: 10px;
+}

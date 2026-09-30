@@ -1,0 +1,36 @@
+/* Tema "vibrante": exemplo de tema alternativo. Só variáveis. */
+:root {
+    --fonte-texto: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+    --fonte-titulo: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+    --peso-titulo: 800;
+
+    --cor-fundo: #14132B;
+    --cor-superficie: #1E1D3F;
+    --cor-superficie-2: #27264F;
+    --cor-campo: #14132B;
+    --cor-cabecalho: #14132B;
+    --borda-cabecalho: 2px solid #F2B84B;
+
+    --cor-texto: #F5F3FF;
+    --cor-texto-suave: #B9B4DA;
+    --cor-marca: #F2B84B;
+    --cor-link: #3FD9C7;
+    --cor-link-hover: #8CEBDF;
+    --cor-foco: #3FD9C7;
+
+    --cor-primaria: #F2B84B;
+    --cor-primaria-hover: #F6CB78;
+    --cor-primaria-texto: #14132B;
+
+    --cor-borda: #34325F;
+    --cor-borda-forte: #4A4780;
+
+    --cor-sucesso: #3FD9C7;
+    --cor-sucesso-fundo: #173C44;
+    --cor-erro: #FF7A8A;
+    --cor-erro-fundo: #3F1F33;
+    --cor-alerta-fundo: #3F3420;
+
+    --raio: 12px;
+    --raio-grande: 18px;
+}

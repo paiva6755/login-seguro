@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Mensagens "flash" enviadas pelos controllers após um redirecionamento -->
+<div th:fragment="mensagens">
+    <p class="aviso aviso-sucesso" role="status" th:if="${sucesso}" th:text="${sucesso}"></p>
+    <p class="aviso aviso-erro" role="alert" th:if="${erro}" th:text="${erro}"></p>
+</div>
+</body>
+</html>

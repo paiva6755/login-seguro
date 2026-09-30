@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<!--
+  Layout base de TODAS as páginas (Thymeleaf Layout Dialect).
+  As páginas só preenchem o fragmento "conteudo"; cabeçalho, rodapé,
+  mensagens e o CSS do tema vêm daqui. Trocar o visual = trocar o tema.
+-->
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE"
+           th:text="${nomeSistema ?: 'Login Seguro'}">Login Seguro</title>
+    <!-- 1) estrutura (não muda entre temas)  2) tema: só cores, fontes e formas -->
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/themes/{t}/theme.css(t=${tema ?: 'padrao'})}">
+</head>
+<body>
+<header th:replace="~{fragments/cabecalho :: cabecalho}"></header>
+
+<main class="pagina">
+    <div th:replace="~{fragments/mensagens :: mensagens}"></div>
+    <div layout:fragment="conteudo"></div>
+</main>
+
+<footer th:replace="~{fragments/rodape :: rodape}"></footer>
+</body>
+</html>

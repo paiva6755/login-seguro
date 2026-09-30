@@ -1,0 +1,11 @@
+# Build
+target/
+
+# Credenciais — NUNCA versionar
+.env
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.DS_Store

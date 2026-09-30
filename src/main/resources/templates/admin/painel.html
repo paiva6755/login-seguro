@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/base}">
+<head><title>Usuários</title></head>
+<body>
+<div layout:fragment="conteudo">
+    <h1>Usuários</h1>
+    <p class="texto-apoio">
+        Altere perfis e ative ou desative contas. Mudanças de perfil valem a partir
+        do próximo login do usuário.
+    </p>
+
+    <div class="rolagem-tabela">
+        <table class="tabela">
+            <thead>
+            <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">E-mail</th>
+                <th scope="col">Perfil</th>
+                <th scope="col">Situação</th>
+                <th scope="col">Conta</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${usuarios}">
+                <td th:text="${u.nome}">Nome</td>
+                <td th:text="${u.email}">email</td>
+                <td>
+                    <form th:action="@{/admin/usuarios/{id}/perfil(id=${u.id})}" method="post" class="form-linha">
+                        <label th:for="'perfil-' + ${u.id}" class="so-leitor">Perfil</label>
+                        <select th:id="'perfil-' + ${u.id}" name="perfil">
+                            <option th:each="p : ${perfis}" th:value="${p}" th:text="${p.descricao}"
+                                    th:selected="${p == u.perfil}">Perfil</option>
+                        </select>
+                        <button type="submit" class="botao botao-discreto">Salvar perfil</button>
+                    </form>
+                </td>
+                <td>
+                    <span th:if="${!u.ativo}" class="etiqueta etiqueta-erro">Desativada</span>
+                    <span th:if="${u.ativo and u.bloqueadoAgora}" class="etiqueta etiqueta-alerta">Bloqueada (tentativas)</span>
+                    <span th:if="${u.ativo and !u.bloqueadoAgora}" class="etiqueta">Ativa</span>
+                </td>
+                <td>
+                    <form th:action="@{/admin/usuarios/{id}/status(id=${u.id})}" method="post" class="form-linha">
+                        <button type="submit" class="botao botao-discreto"
+                                th:text="${u.ativo} ? 'Desativar' : 'Reativar'">Desativar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

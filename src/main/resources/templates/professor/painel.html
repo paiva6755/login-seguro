@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+<head><title>Turma</title></head>
+<body>
+<div layout:fragment="conteudo">
+    <h1>Turma</h1>
+    <p class="texto-apoio">Alunos cadastrados no sistema. Visível para professores e administradores.</p>
+
+    <div class="rolagem-tabela">
+        <table class="tabela">
+            <thead><tr><th scope="col">Nome</th><th scope="col">E-mail</th><th scope="col">Situação</th></tr></thead>
+            <tbody>
+            <tr th:each="a : ${alunos}">
+                <td th:text="${a.nome}">Nome</td>
+                <td th:text="${a.email}">email</td>
+                <td th:text="${a.ativo} ? 'Ativo' : 'Desativado'">Ativo</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(alunos)}">
+                <td colspan="3">Nenhum aluno cadastrado ainda. Novos cadastros aparecem aqui.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
