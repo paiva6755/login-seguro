@@ -29,7 +29,34 @@ Navegador ──► Spring Security (filtros) ──► Controller ──► Ser
 5. Falha: contador de tentativas incrementado; na 5ª, bloqueio de 15 minutos. A tela mostra
    mensagem genérica, sem revelar se o e-mail existe.
 
-## 3. Modelo de dados
+## 3. Fluxo de recuperação de senha
+
+1. `POST /esqueci-senha`: se o e-mail pertence a uma conta ativa, o sistema gera um token de
+   32 bytes (`SecureRandom`), grava apenas o **hash SHA-256** em `tokens_recuperacao` com validade
+   de 30 minutos e envia o link por e-mail. Links anteriores do mesmo usuário são invalidados.
+2. A tela responde sempre com a mesma mensagem, exista ou não a conta (evita enumeração).
+3. `GET /redefinir-senha?token=...`: o token é validado pelo hash e pela data de expiração.
+4. `POST /redefinir-senha`: nova senha validada pelas mesmas regras do cadastro, gravada com
+   BCrypt; o token é apagado (uso único), bloqueios são removidos e **todas as sessões abertas
+   do usuário são encerradas** (Spring Session, busca por principal).
+5. Tokens expirados são apagados pelo próprio MongoDB (índice TTL).
+
+## 4. Log de auditoria
+
+Eventos registrados na coleção `auditoria` por `AuditoriaService`:
+
+| Origem | Eventos |
+|---|---|
+| `EventosAutenticacaoListener` (eventos do Spring Security) | Login, falha de login (com motivo), logout |
+| `UsuarioService` | Cadastro, bloqueio por tentativas, alteração de perfil, desativação/reativação |
+| `RecuperacaoSenhaService` | Recuperação solicitada, senha redefinida |
+| `PainelController` | Acesso negado (página tentada e perfil) |
+
+Cada registro guarda data/hora, tipo, usuário, conta afetada, IP e detalhes; nunca senhas ou
+tokens. Falhas na gravação do log não interrompem a ação do usuário. O índice TTL em `dataHora`
+apaga registros após 180 dias, limitando a retenção de dados pessoais (LGPD).
+
+## 5. Modelo de dados
 
 **Coleção `usuarios`**
 
@@ -44,10 +71,14 @@ Navegador ──► Spring Security (filtros) ──► Controller ──► Ser
 | `tentativasFalhas`, `bloqueadoAte` | int, date | proteção contra força bruta |
 | `ultimoLogin`, `criadoEm`, `atualizadoEm` | date | auditoria |
 
+**Coleção `auditoria`**: `dataHora` (TTL 180 dias), `tipo`, `usuario`, `alvo`, `ip`, `detalhes`.
+
+**Coleção `tokens_recuperacao`**: `tokenHash` (único), `usuarioId`, `expiraEm` (TTL).
+
 **Coleção `sessoes`**: gerenciada pelo Spring Session (ID, atributos serializados, expiração).
 Permite reiniciar a aplicação ou rodar várias instâncias sem perder sessões.
 
-## 4. Decisões de segurança
+## 6. Decisões de segurança
 
 | Decisão | Motivo |
 |---|---|
@@ -60,12 +91,16 @@ Permite reiniciar a aplicação ou rodar várias instâncias sem perder sessões
 | Content-Security-Policy restritiva | Mitiga XSS; nenhum script ou estilo inline |
 | Credenciais apenas em variáveis de ambiente / `.env` | Nada sensível no GitHub |
 | Hash da senha removido da sessão após login | Reduz exposição de dados |
+| Token de recuperação guardado como hash, uso único, 30 min | Vazamento do banco não permite trocar senhas |
+| Resposta idêntica no "esqueci minha senha" | Não revela quais e-mails estão cadastrados |
+| Sessões encerradas após redefinir a senha | Quem usava a senha antiga perde o acesso |
+| Auditoria com retenção de 180 dias | Rastreabilidade com retenção limitada (LGPD) |
 
 **Limitações conhecidas (evolução prevista):** a tela de cadastro informa quando um e-mail já
 existe (usabilidade em troca de enumeração de contas); mudança de perfil vale no próximo login;
-recuperação de senha por e-mail e verificação de e-mail estão fora do escopo.
+verificação do e-mail no cadastro e limite de pedidos de recuperação por IP estão previstos.
 
-## 5. Temas desacoplados
+## 7. Temas desacoplados
 
 - `static/css/base.css`: somente estrutura, usando variáveis (`var(--cor-primaria)`, etc.).
 - `static/themes/<nome>/theme.css`: somente valores dessas variáveis.
@@ -74,7 +109,7 @@ recuperação de senha por e-mail e verificação de e-mail estão fora do escop
 
 Um tema novo exige um arquivo CSS e uma linha de configuração.
 
-## 6. Guia de adaptação ao PFC
+## 8. Guia de adaptação a outros projetos
 
 | Objetivo | Onde mexer |
 |---|---|
@@ -85,3 +120,5 @@ Um tema novo exige um arquivo CSS e uma linha de configuração.
 | Nome do sistema | Variável `APP_NOME` |
 | Regras de senha | Anotações em `CadastroForm` |
 | Tempo de bloqueio/tentativas | Constantes em `UsuarioService` |
+| Validade do link de recuperação | `RecuperacaoSenhaService.VALIDADE` |
+| Novo evento de auditoria | Constante em `TipoEvento` + chamada a `AuditoriaService.registrar` |

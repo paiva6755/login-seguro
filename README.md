@@ -1,8 +1,9 @@
 # Login Seguro: Spring Boot + Thymeleaf + MongoDB Atlas
 
 Sistema de autenticação e autorização modular, desenvolvido como atividade da disciplina e
-pensado para ser reaproveitado no PFC. Inclui cadastro, login, logout, controle de acesso por
-perfil (3 perfis), sessões persistidas no MongoDB Atlas e temas visuais configuráveis.
+pensado para ser reaproveitado em outros projetos. Inclui cadastro, login, logout, recuperação de
+senha por e-mail, log de auditoria, controle de acesso por perfil (3 perfis), sessões persistidas
+no MongoDB Atlas e temas visuais configuráveis.
 
 ## Tecnologias
 
@@ -14,6 +15,7 @@ perfil (3 perfis), sessões persistidas no MongoDB Atlas e temas visuais configu
 | Banco de dados | MongoDB Atlas (Spring Data MongoDB) |
 | Sessões | Spring Session MongoDB (coleção `sessoes`) |
 | Interface | Thymeleaf + Layout Dialect + Spring Security Extras |
+| E-mail | Spring Mail (SMTP, ex.: Gmail) |
 | Build | Maven |
 
 ## Funcionalidades
@@ -23,15 +25,20 @@ perfil (3 perfis), sessões persistidas no MongoDB Atlas e temas visuais configu
 - Login, logout (POST com CSRF) e sessão com expiração de 30 minutos.
 - Bloqueio temporário de 15 minutos após 5 senhas erradas seguidas.
 - Três perfis com acesso por rota: **ALUNO**, **PROFESSOR** e **ADMIN**.
+- Recuperação de senha por e-mail: link de uso único, válido por 30 minutos; o token é
+  armazenado apenas como hash SHA-256 e as sessões abertas são encerradas após a troca.
+- Log de auditoria (coleção `auditoria`): cadastro, login, falha de login, bloqueio, logout,
+  acesso negado, alterações de perfil/status, recuperação e redefinição de senha, com data, IP e
+  detalhes. Consulta com filtro em `/admin/auditoria`; retenção automática de 180 dias.
 - Área administrativa para trocar perfis e ativar/desativar contas.
 - Administrador inicial criado automaticamente a partir de variáveis de ambiente.
-- Temas visuais trocáveis (`padrao`, `escuro`, `aprendo`) sem alterar Java ou HTML.
+- Temas visuais trocáveis (`padrao`, `escuro`, `vibrante`) sem alterar Java ou HTML.
 
 ## Perfis e rotas
 
 | Rota | Visitante | Aluno | Professor | Admin |
 |---|:-:|:-:|:-:|:-:|
-| `/`, `/login`, `/cadastro` | ✔ | ✔ | ✔ | ✔ |
+| `/`, `/login`, `/cadastro`, `/esqueci-senha`, `/redefinir-senha` | ✔ | ✔ | ✔ | ✔ |
 | `/aluno/**` | | ✔ | ✔ | ✔ |
 | `/professor/**` | | | ✔ | ✔ |
 | `/admin/**` | | | | ✔ |
@@ -81,7 +88,8 @@ login-seguro/
 5. Substituir `<usuario>` e `<senha>`. Caracteres especiais na senha precisam de URL-encoding
    (ex.: `@` → `%40`, `#` → `%23`).
 
-O banco `login_seguro` e as coleções `usuarios` e `sessoes` são criados automaticamente na
+O banco `login_seguro` e as coleções `usuarios`, `sessoes`, `auditoria` e `tokens_recuperacao`
+são criados automaticamente na
 primeira execução. A conexão `mongodb+srv` usa TLS por padrão.
 
 ## Execução local
@@ -112,11 +120,25 @@ Testes unitários: `mvn test`.
 | `MONGODB_DATABASE` | não | Nome do banco (padrão `login_seguro`) |
 | `ADMIN_EMAIL` / `ADMIN_SENHA` | recomendado | Administrador criado na primeira execução |
 | `APP_NOME` | não | Nome exibido no cabeçalho |
-| `APP_TEMA` | não | Tema padrão (`padrao`, `escuro`, `aprendo`) |
+| `APP_TEMA` | não | Tema padrão (`padrao`, `escuro`, `vibrante`) |
 | `COOKIE_SECURE` | não | `true` em produção com HTTPS |
+| `MAIL_HOST` / `MAIL_PORT` | não | Servidor SMTP (ex.: `smtp.gmail.com` / `587`) |
+| `MAIL_USERNAME` / `MAIL_PASSWORD` | não | Conta e senha de app do e-mail remetente |
+| `APP_URL` | não | Endereço do sistema usado no link do e-mail (padrão `http://localhost:8080`) |
 
 As variáveis podem vir do `.env` (lido via `spring.config.import`) ou do sistema operacional.
 O `.env` está no `.gitignore`: **nenhuma credencial é versionada**.
+
+## Recuperação de senha por e-mail (Gmail)
+
+1. Ativar a **verificação em duas etapas** na conta Google que enviará os e-mails.
+2. Em `myaccount.google.com/apppasswords`, criar uma senha de app (ex.: "Login Seguro").
+3. Preencher no `.env`: `MAIL_HOST=smtp.gmail.com`, `MAIL_PORT=587`, `MAIL_USERNAME` com o
+   e-mail e `MAIL_PASSWORD` com a senha de app de 16 letras, **sem espaços**.
+4. Reiniciar o sistema e usar **Esqueci minha senha** na tela de login.
+
+**Modo de teste:** com `MAIL_HOST` vazio, nenhum e-mail é enviado e o link de redefinição
+aparece no terminal. Não usar em produção.
 
 ## Temas
 
@@ -139,3 +161,5 @@ Decisões de arquitetura, fluxo de autenticação e guia de adaptação ao PFC:
 | Timeout ao conectar | IP não liberado em Network Access |
 | `Authentication failed` (Mongo) | Usuário/senha do banco incorretos ou senha sem URL-encoding |
 | Admin não criado | `ADMIN_SENHA` com menos de 8 caracteres ou e-mail já existente |
+| `Authentication failed` / `535` no e-mail | Senha normal em vez de senha de app, ou senha de app com espaços |
+| E-mail não chega | Verificar spam; conferir no terminal a linha `E-mail de redefinição enviado` |

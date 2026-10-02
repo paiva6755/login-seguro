@@ -58,6 +58,11 @@
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-data-mongodb</artifactId>
         </dependency>
+        <!-- Envio de e-mail (recuperação de senha) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
         <!-- Validação de formulários (@NotBlank, @Email, ...) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

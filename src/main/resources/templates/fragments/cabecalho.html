@@ -11,6 +11,7 @@
             <a th:href="@{/painel}">Meu painel</a>
             <a sec:authorize="hasAnyRole('PROFESSOR','ADMIN')" th:href="@{/professor}">Turma</a>
             <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">Usuários</a>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/auditoria}">Auditoria</a>
             <span class="usuario-atual" sec:authentication="principal.nome">Nome</span>
             <!-- Logout é POST para exigir o token CSRF -->
             <form th:action="@{/logout}" method="post" class="form-linha">

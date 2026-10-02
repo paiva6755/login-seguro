@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+<head><title>Criar nova senha</title></head>
+<body>
+<div layout:fragment="conteudo" class="caixa-formulario">
+    <h1>Criar nova senha</h1>
+
+    <form th:action="@{/redefinir-senha}" th:object="${form}" method="post" class="formulario" novalidate>
+        <!-- O token do link vai oculto; sem ele a troca não é aceita -->
+        <input type="hidden" th:field="*{token}">
+
+        <div class="campo" th:classappend="${#fields.hasErrors('senha')} ? 'campo-invalido'">
+            <label for="senha">Nova senha</label>
+            <input type="password" id="senha" name="senha" th:value="''" autocomplete="new-password" required>
+            <p class="dica">Mínimo de 8 caracteres, com maiúscula, minúscula e número.</p>
+            <p class="erro-campo" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></p>
+        </div>
+
+        <div class="campo" th:classappend="${#fields.hasErrors('confirmacaoSenha')} ? 'campo-invalido'">
+            <label for="confirmacaoSenha">Repita a nova senha</label>
+            <input type="password" id="confirmacaoSenha" name="confirmacaoSenha" th:value="''"
+                   autocomplete="new-password" required>
+            <p class="erro-campo" th:if="${#fields.hasErrors('confirmacaoSenha')}"
+               th:errors="*{confirmacaoSenha}"></p>
+        </div>
+
+        <button type="submit" class="botao botao-largo">Salvar nova senha</button>
+    </form>
+</div>
+</body>
+</html>

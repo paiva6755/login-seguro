@@ -1,6 +1,7 @@
 package br.umc.loginseguro;
 
 import br.umc.loginseguro.model.Role;
+import br.umc.loginseguro.service.RecuperacaoSenhaService;
 import br.umc.loginseguro.service.UsuarioService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,5 +30,13 @@ class RegrasBasicasTest {
         assertNotEquals("Senha123", hash);
         assertTrue(encoder.matches("Senha123", hash));
         assertFalse(encoder.matches("senha123", hash));
+    }
+
+    @Test
+    void tokenDeRecuperacaoEArmazenadoComoHash() {
+        String hash = RecuperacaoSenhaService.hashToken("token-de-exemplo");
+        assertEquals(64, hash.length());                  // SHA-256 em hexadecimal
+        assertNotEquals("token-de-exemplo", hash);
+        assertEquals(hash, RecuperacaoSenhaService.hashToken("token-de-exemplo")); // determinístico
     }
 }

@@ -4,6 +4,7 @@ import br.umc.loginseguro.dto.CadastroForm;
 import br.umc.loginseguro.exception.EmailJaCadastradoException;
 import br.umc.loginseguro.exception.OperacaoNaoPermitidaException;
 import br.umc.loginseguro.model.Role;
+import br.umc.loginseguro.model.TipoEvento;
 import br.umc.loginseguro.model.Usuario;
 import br.umc.loginseguro.repository.UsuarioRepository;
 import org.springframework.dao.DuplicateKeyException;
@@ -34,10 +35,13 @@ public class UsuarioService {
 
     private final UsuarioRepository repositorio;
     private final PasswordEncoder passwordEncoder;
+    private final AuditoriaService auditoria;
 
-    public UsuarioService(UsuarioRepository repositorio, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository repositorio, PasswordEncoder passwordEncoder,
+                          AuditoriaService auditoria) {
         this.repositorio = repositorio;
         this.passwordEncoder = passwordEncoder;
+        this.auditoria = auditoria;
     }
 
     /** E-mails são comparados sempre em minúsculas e sem espaços. */
@@ -50,7 +54,10 @@ public class UsuarioService {
      * para impedir que alguém se cadastre como administrador.
      */
     public Usuario cadastrar(CadastroForm form) {
-        return criarUsuario(form.getNome(), form.getEmail(), form.getSenha(), PERFIL_PADRAO_CADASTRO);
+        Usuario novo = criarUsuario(form.getNome(), form.getEmail(), form.getSenha(), PERFIL_PADRAO_CADASTRO);
+        auditoria.registrar(TipoEvento.CADASTRO, novo.getEmail(), novo.getEmail(),
+                "Cadastro público com perfil " + PERFIL_PADRAO_CADASTRO.name());
+        return novo;
     }
 
     /** Cria um usuário com qualquer perfil (uso interno, ex.: admin inicial). */
@@ -88,8 +95,11 @@ public class UsuarioService {
     public void alterarPerfil(String id, Role novoPerfil, String emailSolicitante) {
         Usuario usuario = buscar(id);
         impedirAcaoSobreSiMesmo(usuario, emailSolicitante, "Você não pode alterar o próprio perfil.");
+        Role anterior = usuario.getPerfil();
         usuario.setPerfil(novoPerfil);
         repositorio.save(usuario);
+        auditoria.registrar(TipoEvento.PERFIL_ALTERADO, normalizarEmail(emailSolicitante), usuario.getEmail(),
+                "De " + anterior + " para " + novoPerfil);
     }
 
     /** Admin ativa/desativa uma conta. Reativar também remove bloqueios. */
@@ -102,6 +112,8 @@ public class UsuarioService {
             usuario.setBloqueadoAte(null);
         }
         repositorio.save(usuario);
+        auditoria.registrar(usuario.isAtivo() ? TipoEvento.CONTA_REATIVADA : TipoEvento.CONTA_DESATIVADA,
+                normalizarEmail(emailSolicitante), usuario.getEmail(), "Alterado pelo administrador");
     }
 
     /** Chamado a cada senha errada. Ao atingir o limite, bloqueia temporariamente. */
@@ -111,6 +123,9 @@ public class UsuarioService {
             if (tentativas >= MAX_TENTATIVAS) {
                 usuario.setBloqueadoAte(Instant.now().plus(TEMPO_BLOQUEIO));
                 tentativas = 0;
+                auditoria.registrar(TipoEvento.CONTA_BLOQUEADA, usuario.getEmail(), usuario.getEmail(),
+                        MAX_TENTATIVAS + " senhas incorretas seguidas; bloqueio de "
+                                + TEMPO_BLOQUEIO.toMinutes() + " minutos");
             }
             usuario.setTentativasFalhas(tentativas);
             repositorio.save(usuario);
@@ -125,6 +140,14 @@ public class UsuarioService {
             usuario.setUltimoLogin(Instant.now());
             repositorio.save(usuario);
         });
+    }
+
+    /** Troca a senha (usado na recuperação) e remove bloqueios por tentativas. */
+    public void definirNovaSenha(Usuario usuario, String senhaPura) {
+        usuario.setSenhaHash(passwordEncoder.encode(senhaPura));
+        usuario.setTentativasFalhas(0);
+        usuario.setBloqueadoAte(null);
+        repositorio.save(usuario);
     }
 
     private Usuario buscar(String id) {

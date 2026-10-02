@@ -2,6 +2,8 @@ package br.umc.loginseguro.controller;
 
 import br.umc.loginseguro.exception.OperacaoNaoPermitidaException;
 import br.umc.loginseguro.model.Role;
+import br.umc.loginseguro.model.TipoEvento;
+import br.umc.loginseguro.service.AuditoriaService;
 import br.umc.loginseguro.security.UsuarioLogado;
 import br.umc.loginseguro.service.UsuarioService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,7 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
- * Área administrativa: listar usuários, trocar perfil, ativar/desativar.
+ * Área administrativa: listar usuários, trocar perfil, ativar/desativar
+ * e consultar o log de auditoria.
  * Protegida por URL (SecurityConfig) E por @PreAuthorize (defesa em camadas).
  */
 @Controller
@@ -25,9 +28,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AdminController {
 
     private final UsuarioService usuarioService;
+    private final AuditoriaService auditoria;
 
-    public AdminController(UsuarioService usuarioService) {
+    public AdminController(UsuarioService usuarioService, AuditoriaService auditoria) {
         this.usuarioService = usuarioService;
+        this.auditoria = auditoria;
     }
 
     @GetMapping
@@ -63,5 +68,14 @@ public class AdminController {
             redirecionamento.addFlashAttribute("erro", e.getMessage());
         }
         return "redirect:/admin";
+    }
+
+    /** Log de auditoria: últimos 200 eventos, com filtro opcional por tipo. */
+    @GetMapping("/auditoria")
+    public String auditoria(@RequestParam(required = false) TipoEvento tipo, Model model) {
+        model.addAttribute("registros", auditoria.ultimos(tipo));
+        model.addAttribute("tipos", TipoEvento.values());
+        model.addAttribute("tipoSelecionado", tipo);
+        return "admin/auditoria";
     }
 }

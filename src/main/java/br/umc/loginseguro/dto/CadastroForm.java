@@ -23,9 +23,8 @@ public class CadastroForm {
     private String email;
 
     @NotBlank(message = "Crie uma senha.")
-    @Size(min = 8, max = 64, message = "A senha deve ter entre 8 e 64 caracteres.")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$",
-             message = "A senha precisa de letra maiúscula, letra minúscula e número.")
+    @Size(min = RegrasSenha.MINIMO, max = RegrasSenha.MAXIMO, message = RegrasSenha.MENSAGEM_TAMANHO)
+    @Pattern(regexp = RegrasSenha.PADRAO, message = RegrasSenha.MENSAGEM_PADRAO)
     private String senha;
 
     @NotBlank(message = "Repita a senha.")

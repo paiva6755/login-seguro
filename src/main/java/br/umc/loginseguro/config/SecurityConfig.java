@@ -24,7 +24,8 @@ public class SecurityConfig {
 
     /** Rotas acessíveis sem login. */
     private static final String[] ROTAS_PUBLICAS = {
-            "/", "/login", "/cadastro", "/tema", "/acesso-negado", "/error",
+            "/", "/login", "/cadastro", "/esqueci-senha", "/redefinir-senha",
+            "/tema", "/acesso-negado", "/error",
             "/css/**", "/themes/**", "/img/**", "/js/**", "/favicon.ico"
     };
 
