@@ -3,7 +3,7 @@ package br.umc.loginseguro.model;
 /**
  * Perfis de acesso do sistema.
  *
- * PARA ADAPTAR AO PFC: renomeie ou adicione constantes aqui e ajuste as
+ * PARA ADAPTAR A OUTRO PROJETO: renomeie ou adicione constantes aqui e ajuste as
  * regras de rota em SecurityConfig. O restante do sistema (cadastro, login,
  * sessão, telas de administração) funciona sem alterações.
  */

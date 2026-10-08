@@ -150,7 +150,7 @@ O usuário escolhe o tema pelo seletor no cabeçalho; a escolha fica na sessão.
 
 ## Documentação complementar
 
-Decisões de arquitetura, fluxo de autenticação e guia de adaptação ao PFC:
+Decisões de arquitetura, fluxo de autenticação e guia de adaptação a outros projetos:
 [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md).
 
 ## Problemas comuns

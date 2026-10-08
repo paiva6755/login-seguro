@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-/** Área do aluno: página base para o conteúdo do PFC. */
+/** Área do aluno: página inicial do perfil aluno. */
 @Controller
 @RequestMapping("/aluno")
 @PreAuthorize("hasAnyRole('ALUNO', 'PROFESSOR', 'ADMIN')")
